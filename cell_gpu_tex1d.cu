@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "para.h"
+#include <ctime>
 
 texture<int> texIn;
 texture<int> texOut;
@@ -10,6 +11,8 @@ __global__ void update_tex1d(int *out, int flag,int dim){
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
 	int offset = x + y*blockDim.x*gridDim.x;
+
+ while (offset < dim * dim) {
 	int sum=0;
 	int origin;
 	
@@ -35,24 +38,39 @@ __global__ void update_tex1d(int *out, int flag,int dim){
 		else out[offset] = 0;
 	}else{
 	if( sum == 3) out[offset] = 1;
+ else out[offset] = 0;
 	}
-
+ offset = offset + blockDim.x * gridDim.x * blockDim.y * gridDim.y;
+    }
 }
 	
 int main(int argc, char *argv[]){
-
+ clock_t start;
 	int dim=100;
 	int nStep=1000;
 	int frequency=100;
 	int size=dim*dim;
 	int step;
 	DataBlock data;
-	data.bitmap=(int *)malloc(size*sizeof(int));
-	int bitmapSize=size*sizeof(int);
+data.bitmap=(int *)malloc(size * sizeof(int));
+    for (int i = 0; i < size; i++) {
+        data.bitmap[i] = 0;
+    }
+    data.bitmap[1]=1;
+    data.bitmap[dim+2] = 1;
+    data.bitmap[2 * dim + 0] = 1;
+    data.bitmap[2 * dim + 1] = 1;
+    data.bitmap[2 * dim + 2] = 1;
+    data.outbitmap=(int *)malloc(size * sizeof(int));
+    int bitmapSize=size * sizeof(int);
+    
+    start=clock();
+
+
 	int flag;
 	HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_in),bitmapSize));
 	HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_out),bitmapSize));
-//	HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_in),size));
+
 	
 	HANDLE_ERROR(cudaBindTexture (NULL, texIn, data.dev_in, bitmapSize));
 	HANDLE_ERROR(cudaBindTexture (NULL, texOut, data.dev_out, bitmapSize));
@@ -90,5 +108,5 @@ int main(int argc, char *argv[]){
 
 	HANDLE_ERROR(cudaFree(data.dev_in));
 	HANDLE_ERROR(cudaFree(data.dev_out));
-
+    printf("%d\n", clock() - start);
 }
