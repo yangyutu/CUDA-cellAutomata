@@ -97,16 +97,16 @@ data.bitmap=(int *)malloc(size * sizeof(int));
 	if(step % frequency == 0){
 	HANDLE_ERROR(cudaMemcpy(data.outbitmap,data.dev_out,bitmapSize,cudaMemcpyDeviceToHost));
 
-      printf ( "\nIteration %d: final grid:\n", step );
-      for ( int j = 0; j < size; j++ ) {
-        if ( j % dim == 0 ) {printf( "\n" );}
-        printf ( "%d", data.outbitmap[j] );
-      }
-      printf( "\n" );
+//      printf ( "\nIteration %d: final grid:\n", step );
+//      for ( int j = 0; j < size; j++ ) {
+//        if ( j % dim == 0 ) {printf( "\n" );}
+//        printf ( "%d", data.outbitmap[j] );
+//      }
+//      printf( "\n" );
 	}
     	}
 
 	HANDLE_ERROR(cudaFree(data.dev_in));
 	HANDLE_ERROR(cudaFree(data.dev_out));
-    printf("%d\n", ((float)(clock() - start))/CLOCKS_PER_SEC);
+    printf("%f\n", ((float)(clock() - start))/CLOCKS_PER_SEC);
 }
