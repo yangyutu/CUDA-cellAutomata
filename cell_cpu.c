@@ -25,10 +25,10 @@ int update_cell(int *grid, int *grid_copy, int i, int dim) {
     live_neighbor -= grid_copy[i];
     
     //-------------------------- update grid[i] -----------------------------
-    if ( grid[i] == 1 && (live_neighbor == 2 || live_neighbor == 3)) {
+    if ( grid_copy[i] == 1 && (live_neighbor == 2 || live_neighbor == 3)) {
         grid[i] = 1;
     }
-    else if (grid[i] == 0 && live_neighbor == 3) {
+    else if (grid_copy[i] == 0 && live_neighbor == 3) {
         grid[i] = 1;
     }
     else {
@@ -83,9 +83,9 @@ int timeval_subtract (struct timeval * result, struct timeval * x, struct timeva
  * MAIN ENTRY
  *********************************************************/
 int main() {
-    int dim = 16; // dimension
-    int nSteps = 64; // number of steps
-    int frequency = 1; // frequency of printing outputs
+    int dim = 1600; // dimension
+    int nSteps = 64000; // number of steps
+    int frequency = 100000; // frequency of printing outputs
     int size = dim * dim; // size of 1-d array
     int *grid = NULL; // grid use to update
     int *grid_copy = NULL; // copy of original grid in each iteration
@@ -106,24 +106,13 @@ int main() {
     gettimeofday(&ta, NULL);
     for (int iter = 0; iter < 8; iter++) {
         //------- update grid ------
-        if (iter == 5){
-            printf("%d before grid:\n", iter);
-            display_grid(grid, dim);
-        }
         for (int i = 0; i < size; i++) {
             update_cell(grid, grid_copy, i, dim);
-        }
-        if (iter == 5){
-            printf("%d after grid:\n", iter);
-            display_grid(grid, dim);
-            printf("%d after grid_copy:\n", iter);
-            display_grid(grid_copy, dim);
         }
         //---- update grid_copy ----
         memcpy((void *)grid_copy, (const void *)grid, size);
         //-------- print out -------
-//        if(iter % frequency == frequency - 1) {
-        if(iter  == 5 || iter == 4) {
+        if(iter % frequency == 0) {
             printf("Iteration %d / %d: \n", iter + 1, nSteps);
             display_grid(grid, dim);
         }
