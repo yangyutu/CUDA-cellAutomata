@@ -72,8 +72,8 @@ data.bitmap=(int *)malloc(size * sizeof(int));
 	HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_out),bitmapSize));
 
 	cudaChannelFormatDesc desc = cudaCreateChannelDesc<int>();
-	HANDLE_ERROR(cudaBindTexture2D (NULL, texIn, data.dev_in, desc,dim,dim,bitmapSize));
-	HANDLE_ERROR(cudaBindTexture2D (NULL, texOut, data.dev_out, desc,dim,dim,bitmapSize));
+	HANDLE_ERROR(cudaBindTexture2D (NULL, texIn, data.dev_in, desc,dim,dim,sizeof(int) * dim ));
+	HANDLE_ERROR(cudaBindTexture2D (NULL, texOut, data.dev_out, desc,dim,dim,sizeof(int) * dim ));
 
 
 
