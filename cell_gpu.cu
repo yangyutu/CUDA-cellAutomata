@@ -4,14 +4,15 @@
 
 
 // the kernel to udpate the state of each cell based on its neighbors for certain number of steps
-__global__ void update(int *out, int *in, int dim){
+__global__ void update(int *in, int *out, int dim){
 
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
-	int offset = x + y*blockDim.x*gridDim.x;
-	int sum=0;
-	for(int i=-1;i<2;i++){
-		for(int j=-1;j<2;j++){
+	int offset = x + y * blockDim.x * gridDim.x;
+	while(offset < dim*dim){
+        int sum = 0;
+	for(int i=-1; i<2; i++) {
+		for(int j=-1; j<2; j++) {
 			int xtemp=(x+i+dim)%dim;
 			int ytemp=(y+j+dim)%dim;
 			int offsettemp=xtemp + ytemp*blockDim.x*gridDim.x;
@@ -24,27 +25,36 @@ __global__ void update(int *out, int *in, int dim){
 		else out[offset] = 0;
 	}else{
 	if( sum == 3) out[offset] = 1;
+        else out[offset] = 0;
 	}
+        offset = offset + blockDim.x * gridDim.x * blockDim.y * gridDim.y;
+        }
 
 }
 	
 int main(int argc, char *argv[]){
 
-	int dim=100;
-	int nStep=1000;
-	int frequency=100;
+	int dim=16;
+	int nStep=64;
+	int frequency=8;
 	int size=dim*dim;
 	int step;
 	DataBlock data;
 	data.bitmap=(int *)malloc(size*sizeof(int));
-	int bitmapSize=size*sizeof(int);
+        for (int i=0; i<size; i++) {
+		data.bitmap[i] = 0;
+	}
+	data.bitmap[1]=1;
+        data.bitmap[dim+2] = 1;
+        data.bitmap[2 * dim + 0] = 1;
+        data.bitmap[2 * dim + 1] = 1;
+        data.bitmap[2 * dim + 2] = 1;
+	data.outbitmap=(int *)malloc(size*sizeof(int));
+        int bitmapSize=size*sizeof(int);
 
 	HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_in),bitmapSize));
 	HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_out),bitmapSize));
-//	HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_in),size));
 	
-//	HANDLE_ERROR(cudaBindTexture (NULL, texIn, data.dev_in, bitmapSize));
-//	HANDLE_ERROR(cudaBindTexture (NULL, texOut, data.dev_out, bitmapSize));
 
 
 
@@ -54,23 +64,19 @@ int main(int argc, char *argv[]){
 	dim3 dimblock(16,16);
 
 	for(step = 0; step<nStep; step++ ){
-	
 	update<<<dimgrid,dimblock>>>(data.dev_in,data.dev_out,dim);
 	
 	swap(data.dev_in,data.dev_out);
-
-	if(step % frequency == 0){
+	if(step % frequency == 0 || step == nStep-1){
 	HANDLE_ERROR(cudaMemcpy(data.outbitmap,data.dev_out,bitmapSize,cudaMemcpyDeviceToHost));
-
       printf ( "\nIteration %d: final grid:\n", step );
       for ( int j = 0; j < size; j++ ) {
         if ( j % dim == 0 ) {printf( "\n" );}
-        printf ( "%d  ", data.outbitmap[j] );
+        printf ( "%d", data.outbitmap[j] );
       }
       printf( "\n" );
 	}
-    	}
-
+	}
 	HANDLE_ERROR(cudaFree(data.dev_in));
 	HANDLE_ERROR(cudaFree(data.dev_out));
 
