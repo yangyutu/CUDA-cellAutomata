@@ -43,9 +43,9 @@ __global__ void update(int *in, int *out, int dim){
 int main(int argc, char *argv[]) {
 
     clock_t start;
-    int dim = 2<<8;
-    int nStep = 2<<8;
-    int frequency = 2<<8;
+    int dim = atoi(argv[1]);
+    int nStep = atoi(argv[2]);
+    int frequency = atoi(argv[3]);
     int size = dim * dim;
     int step;
     DataBlock data;
@@ -91,5 +91,5 @@ int main(int argc, char *argv[]) {
     }
     HANDLE_ERROR(cudaFree(data.dev_in));
     HANDLE_ERROR(cudaFree(data.dev_out));
-    printf("%d\n", clock() - start);
+    printf("%f\n", ((float)(clock() - start))/CLOCKS_PER_SEC);
 }

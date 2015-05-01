@@ -46,9 +46,9 @@ __global__ void update_tex1d(int *out, int flag,int dim){
 	
 int main(int argc, char *argv[]){
  clock_t start;
-	int dim=100;
-	int nStep=1000;
-	int frequency=100;
+	int dim=atoi(argv[1]);
+	int nStep=atoi(argv[2]);
+	int frequency=atoi(argv[3]);
 	int size=dim*dim;
 	int step;
 	DataBlock data;
@@ -100,7 +100,7 @@ data.bitmap=(int *)malloc(size * sizeof(int));
       printf ( "\nIteration %d: final grid:\n", step );
       for ( int j = 0; j < size; j++ ) {
         if ( j % dim == 0 ) {printf( "\n" );}
-        printf ( "%d  ", data.outbitmap[j] );
+        printf ( "%d", data.outbitmap[j] );
       }
       printf( "\n" );
 	}
@@ -108,5 +108,5 @@ data.bitmap=(int *)malloc(size * sizeof(int));
 
 	HANDLE_ERROR(cudaFree(data.dev_in));
 	HANDLE_ERROR(cudaFree(data.dev_out));
-    printf("%d\n", clock() - start);
+    printf("%d\n", ((float)(clock() - start))/CLOCKS_PER_SEC);
 }
