@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "para.h"
-
+#include <ctime>
 
 
 // the kernel to udpate the state of each cell based on its neighbors for certain number of steps
@@ -34,9 +34,10 @@ __global__ void update(int *in, int *out, int dim){
 	
 int main(int argc, char *argv[]){
 
-	int dim=16;
-	int nStep=64;
-	int frequency=8;
+    clock_t start;
+	int dim=2<<8;
+	int nStep=2<<8;
+	int frequency=2<<8;
 	int size=dim*dim;
 	int step;
 	DataBlock data;
@@ -52,6 +53,7 @@ int main(int argc, char *argv[]){
 	data.outbitmap=(int *)malloc(size*sizeof(int));
         int bitmapSize=size*sizeof(int);
 
+	start=clock();
 	HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_in),bitmapSize));
 	HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_out),bitmapSize));
 	
@@ -67,7 +69,7 @@ int main(int argc, char *argv[]){
 	update<<<dimgrid,dimblock>>>(data.dev_in,data.dev_out,dim);
 	
 	swap(data.dev_in,data.dev_out);
-	if(step % frequency == 0 || step == nStep-1){
+	if(step % frequency == 0 ){
 	HANDLE_ERROR(cudaMemcpy(data.outbitmap,data.dev_out,bitmapSize,cudaMemcpyDeviceToHost));
       printf ( "\nIteration %d: final grid:\n", step );
       for ( int j = 0; j < size; j++ ) {
@@ -79,5 +81,5 @@ int main(int argc, char *argv[]){
 	}
 	HANDLE_ERROR(cudaFree(data.dev_in));
 	HANDLE_ERROR(cudaFree(data.dev_out));
-
+    printf("%d\n",clock()-start);
 }
