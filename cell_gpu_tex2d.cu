@@ -14,7 +14,7 @@ __global__ void update_tex1d(int *out, int flag,int dim){
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
 	int offset = x + y * blockDim.x * gridDim.x;
 
- while (offset < dim * dim) {
+while (offset < dim * dim) {
 	int sum = 0;
 	int origin;
 	
@@ -102,17 +102,18 @@ int main(int argc, char *argv[]){
 
 		if(step % frequency == frequency - 1){
 			HANDLE_ERROR(cudaMemcpy(data.outbitmap,data.dev_out,bitmapSize,cudaMemcpyDeviceToHost));
-
-//      printf ( "\nIteration %d: final grid:\n", step );
-//      for ( int j = 0; j < size; j++ ) {
-//        if ( j % dim == 0 ) {printf( "\n" );}
-//        printf ( "%d  ", data.outbitmap[j] );
-//      }
-//      printf( "\n" );
+			printf ("\nIteration %d / %d : \n", step + 1, nStep);
+			for ( int j = 0; j < size; j++ ) {
+				if (j % dim == 0) {
+					printf( "\n" );
+				}
+				printf ("%d  ", data.outbitmap[j]);
+			}
+			printf("\n");
 		}
     }
 
 	HANDLE_ERROR(cudaFree(data.dev_in));
 	HANDLE_ERROR(cudaFree(data.dev_out));
-    printf("%f\n", ((float)(clock() - start))/CLOCKS_PER_SEC);
+    printf("%f\n", ((float)(clock() - start)) / CLOCKS_PER_SEC);
 }
