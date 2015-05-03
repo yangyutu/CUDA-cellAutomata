@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
     int size = dim * dim; // size of 1-d array
     int *grid = NULL; // grid use to update
     int *grid_copy = NULL; // copy of original grid in each iteration
+    int *temp = NULL;
     clock_t start;
    
     grid = (int *)malloc(size * sizeof(int));
@@ -86,12 +87,15 @@ int main(int argc, char *argv[]) {
             update_cell(grid, grid_copy, i, dim, iter);
         }
         //---- update grid_copy ----
-        memcpy((void *)grid_copy, (const void *)grid, size * sizeof(int));
+        // memcpy((void *)grid_copy, (const void *)grid, size * sizeof(int));
+        temp = grid_copy;
+        grid_copy = grid;
+        grid = temp;
         //-------- print out -------
-        if(iter % frequency == frequency - 1) {
-            printf("Iteration %d / %d: \n", iter + 1, nSteps);
-            display_grid(grid, dim);
-        }
+        // if(iter % frequency == frequency - 1) {
+        //     printf("Iteration %d / %d: \n", iter + 1, nSteps);
+        //     display_grid(grid, dim);
+        // }
     }
 
     //-------- print elapsed time ------
