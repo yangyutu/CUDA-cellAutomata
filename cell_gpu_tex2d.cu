@@ -100,7 +100,7 @@ int main(int argc, char *argv[]){
 	
 //		swap(data.dev_in,data.dev_out);
 
-		if(step % frequency == 0){
+		if(step % frequency == frequency - 1){
 			HANDLE_ERROR(cudaMemcpy(data.outbitmap,data.dev_out,bitmapSize,cudaMemcpyDeviceToHost));
 
 //      printf ( "\nIteration %d: final grid:\n", step );

@@ -94,8 +94,8 @@ data.bitmap=(int *)malloc(size * sizeof(int));
 	
 //	swap(data.dev_in,data.dev_out);
 
-	if(step % frequency == 0){
-	HANDLE_ERROR(cudaMemcpy(data.outbitmap,data.dev_out,bitmapSize,cudaMemcpyDeviceToHost));
+	if(step % frequency == frequency - 1){
+		HANDLE_ERROR(cudaMemcpy(data.outbitmap,data.dev_out,bitmapSize,cudaMemcpyDeviceToHost));
 
 //      printf ( "\nIteration %d: final grid:\n", step );
 //      for ( int j = 0; j < size; j++ ) {
