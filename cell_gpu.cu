@@ -98,6 +98,6 @@ int main(int argc, char *argv[]) {
     }
     HANDLE_ERROR(cudaFree(data.dev_in));
     HANDLE_ERROR(cudaFree(data.dev_out));
-    printf("%f %f", gpu_comp_time, gpu_mem_time);
+    printf("%f %f ", gpu_comp_time, gpu_mem_time);
     printf("%f\n", ((float)(clock() - start)) / CLOCKS_PER_SEC);
 }
