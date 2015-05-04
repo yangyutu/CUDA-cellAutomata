@@ -46,7 +46,11 @@ __global__ void update_tex1d(int *out, int flag,int dim){
 }
 	
 int main(int argc, char *argv[]){
- clock_t start;
+    clock_t start;
+    clock_t gpu_start;
+ float gpu_comp_time = 0;
+    float gpu_mem_time = 0;
+
 	int dim = atoi(argv[1]);
 	int nStep = atoi(argv[2]);
 	int frequency = atoi(argv[3]);
@@ -65,7 +69,9 @@ data.bitmap=(int *)malloc(size * sizeof(int));
     data.outbitmap=(int *)malloc(size * sizeof(int));
     int bitmapSize=size * sizeof(int);
     
-    start=clock();
+  start=clock();
+
+    gpu_start = clock();
 
 
 	int flag;
@@ -80,6 +86,8 @@ data.bitmap=(int *)malloc(size * sizeof(int));
 
 	HANDLE_ERROR(cudaMemcpy(data.dev_in, data.bitmap, bitmapSize, cudaMemcpyHostToDevice));
 
+ gpu_mem_time += ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
+
 	dim3 dimgrid(dim/16,dim/16);
 	dim3 dimblock(16,16);
 
@@ -93,13 +101,15 @@ data.bitmap=(int *)malloc(size * sizeof(int));
 		else {
 			out=data.dev_in; flag = 1;
 		}
-
+ gpu_start = clock();
 		update_tex1d<<<dimgrid,dimblock>>>(out, flag, dim);
-	
+	  gpu_comp_time += ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
 //		swap(data.dev_in,data.dev_out);
 
 		if(step % frequency == frequency - 1){
+  gpu_start = clock();
 			HANDLE_ERROR(cudaMemcpy(data.outbitmap,data.dev_out,bitmapSize,cudaMemcpyDeviceToHost));
+  gpu_mem_time += ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
 			printf ("\nIteration %d / %d : \n", step + 1, nStep);
 			for (int j = 0; j < size; j++) {
 				if ( j % dim == 0 ) {
@@ -113,5 +123,6 @@ data.bitmap=(int *)malloc(size * sizeof(int));
 
 	HANDLE_ERROR(cudaFree(data.dev_in));
 	HANDLE_ERROR(cudaFree(data.dev_out));
+  printf("%f %f ", gpu_comp_time, gpu_mem_time);
     printf("%f\n", ((float)(clock() - start)) / CLOCKS_PER_SEC);
 }
