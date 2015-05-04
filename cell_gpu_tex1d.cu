@@ -129,6 +129,6 @@ data.bitmap=(int *)malloc(size * sizeof(int));
   gpu_mem_back_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
 	HANDLE_ERROR(cudaFree(data.dev_in));
 	HANDLE_ERROR(cudaFree(data.dev_out));
-    printf("%f %f ", gpu_comp_time, gpu_mem_to_time, gpu_mem_back_time);
+    printf("%f %f %f", gpu_comp_time, gpu_mem_to_time, gpu_mem_back_time);
     printf("%f\n", ((float)(clock() - start)) / CLOCKS_PER_SEC);
 }
