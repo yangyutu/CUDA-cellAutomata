@@ -5,7 +5,7 @@ if [ ! -e $DIR ]; then
 	mkdir $DIR
 fi
 
------------------- gpu: tex1d ------------------
+# ------------------ gpu: tex1d ------------------
 nvcc cell_gpu_tex1d.cu -o cell_gpu_tex1d
 PATH="$DIR/gpu_tex1d.log"
 if [ -e $PATH ]; then
@@ -14,14 +14,11 @@ if [ -e $PATH ]; then
 fi
  
 for dim in {6..12}; do
-	for freq in {0..10}; do
-		timeval=$(./cell_gpu_tex1d $[2**$dim] 1024 $[2**freq])
-		echo $timeval >> $PATH
-	done
-printf "\n" >> $PATH
+	timeval=$(./cell_gpu_tex1d $[2**$dim] 1024 1)
+	echo $timeval >> $PATH
 done
  
-# #------------------ gpu: tex2d ------------------
+# ------------------ gpu: tex2d ------------------
 nvcc cell_gpu_tex2d.cu -o cell_gpu_tex2d
 PATH="$DIR/gpu_tex2d.log"
 if [ -e $PATH ]; then
@@ -30,9 +27,6 @@ if [ -e $PATH ]; then
 fi
  
 for dim in {6..12}; do
-	for freq in {0..10}; do
-		timeval=$(./cell_gpu_tex2d $[2**$dim] 1024 $[2**freq])
-		echo $timeval >> $PATH
- done
-	printf "\n" >> $PATH
+	timeval=$(./cell_gpu_tex2d $[2**$dim] 1024 1)
+	echo $timeval >> $PATH
 done
