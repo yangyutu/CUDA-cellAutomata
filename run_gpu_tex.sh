@@ -14,8 +14,11 @@ if [ -e $PATH ]; then
 fi
  
 for dim in {6..12}; do
-	timeval=$(./cell_gpu_tex1d $[2**$dim] 1024 1)
-	echo $timeval >> $PATH
+	for i in {1..10}; do 
+		timeval=$(./cell_gpu_tex1d $[2**$dim] 1024 1)
+		echo $timeval >> $PATH
+	done
+	printf "\n" >> $PATH
 done
  
 # ------------------ gpu: tex2d ------------------
@@ -27,6 +30,9 @@ if [ -e $PATH ]; then
 fi
  
 for dim in {6..12}; do
-	timeval=$(./cell_gpu_tex2d $[2**$dim] 1024 1)
-	echo $timeval >> $PATH
+	for i in {1..10}; do
+		timeval=$(./cell_gpu_tex2d $[2**$dim] 1024 1)
+		echo $timeval >> $PATH
+	done
+	printf "\n" >> $PATH
 done
