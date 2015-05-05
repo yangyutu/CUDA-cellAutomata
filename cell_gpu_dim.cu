@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     for(step = 0; step < nStep; step++ ){
 
 
-        update<<<dim,dim>>>(data.dev_in, data.dev_out,dim);
+        update<<<(1,dim), (dim,1)>>>(data.dev_in, data.dev_out,dim);
   
 
         swap(data.dev_in,data.dev_out);
