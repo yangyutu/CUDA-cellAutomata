@@ -72,13 +72,19 @@ int main(int argc, char *argv[]) {
     HANDLE_ERROR(cudaMemcpy(data.dev_in, data.bitmap, bitmapSize, cudaMemcpyHostToDevice));
  gpu_mem_to_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
 
-    // dim3 dimgrid(dim / 16, dim / 16);
-    // dim3 dimblock(16, 16);
-         gpu_start = clock();   
+    if(dim < 1024){
+        dim3 dimgrid(dim, 1);
+        dim3 dimblock(1, dim);
+    } 
+    else {
+        dim3 dimgrid(1024, 1);
+        dim3 dimblock(1, 1024);
+    }
+    gpu_start = clock();   
     for(step = 0; step < nStep; step++ ){
 
 
-        update<<<(1,dim), (dim,1)>>>(data.dev_in, data.dev_out,dim);
+        update<<<dimgrid, dimblock>>>(data.dev_in, data.dev_out,dim);
   
 
         swap(data.dev_in,data.dev_out);

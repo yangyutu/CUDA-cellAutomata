@@ -36,7 +36,7 @@ __global__ void update(int *in, int *out, int dim){
                 out[offset] = 0;
             }
         }
-        offset = offset + blockDim.x * gridDim.x * blockDim.y * gridDim.y;
+        offset = offset + blockDim.x * gridDim.x;
     }
 }
 
@@ -74,12 +74,21 @@ int main(int argc, char *argv[]) {
 
     // dim3 dimgrid(dim / 16, dim / 16);
     // dim3 dimblock(16, 16);
-         gpu_start = clock();   
+    int grid_dim;
+    int block_dim;
+    if (dim < 1024) {
+        grid_dim = dim;
+        block_dim = dim;
+    }
+    else {
+        grid_dim = 1024;
+        grid_dim = 1024;
+    }
+
+    gpu_start = clock();   
     for(step = 0; step < nStep; step++ ){
 
-
-        update<<<dim,dim>>>(data.dev_in, data.dev_out,dim);
-  
+        update<<<grid_dim, block_dim>>>(data.dev_in, data.dev_out,dim);
 
         swap(data.dev_in,data.dev_out);
  //       if(step % frequency == frequency - 1 ){
@@ -97,12 +106,12 @@ int main(int argc, char *argv[]) {
 //        }
     }
 	cudaDeviceSynchronize();
-      gpu_comp_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
-            gpu_start = clock();
-            HANDLE_ERROR(cudaMemcpy(data.outbitmap, data.dev_out, bitmapSize, cudaMemcpyDeviceToHost));
-            gpu_mem_back_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
+    gpu_comp_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
+    gpu_start = clock();
+    HANDLE_ERROR(cudaMemcpy(data.outbitmap, data.dev_out, bitmapSize, cudaMemcpyDeviceToHost));
+    gpu_mem_back_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
     HANDLE_ERROR(cudaFree(data.dev_out));
     HANDLE_ERROR(cudaFree(data.dev_in));
-printf("%f %f %f ", gpu_comp_time, gpu_mem_to_time, gpu_mem_back_time);
+    printf("%f %f %f ", gpu_comp_time, gpu_mem_to_time, gpu_mem_back_time);
     printf("%f\n", ((float)(clock() - start)) / CLOCKS_PER_SEC);
 }
