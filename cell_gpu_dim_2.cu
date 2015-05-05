@@ -15,7 +15,7 @@ __global__ void update(int *in, int *out, int dim){
             for(int j=-1; j < 2; j++) {
                 int xtemp = (x + i + dim) % dim;
                 int ytemp = (y + j + dim) % dim;
-                int offsettemp = xtemp + ytemp * blockDim.x;
+                int offsettemp = xtemp + ytemp * dim;
                 sum = sum + in[offsettemp];
             }
         }
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     }
     else {
         grid_dim = 1024;
-        grid_dim = 1024;
+        block_dim = 1024;
     }
 
     gpu_start = clock();   

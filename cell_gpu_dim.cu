@@ -71,15 +71,14 @@ int main(int argc, char *argv[]) {
     HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_out), bitmapSize));
     HANDLE_ERROR(cudaMemcpy(data.dev_in, data.bitmap, bitmapSize, cudaMemcpyHostToDevice));
  gpu_mem_to_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
-
+	
+	int launch_dim = 1024;
     if(dim < 1024){
-        dim3 dimgrid(dim, 1);
-        dim3 dimblock(1, dim);
+        launch_dim = dim;
     } 
-    else {
-        dim3 dimgrid(1024, 1);
-        dim3 dimblock(1, 1024);
-    }
+	dim3 dimgrid(launch_dim, 1);
+    dim3 dimblock(1, launch_dim);
+
     gpu_start = clock();   
     for(step = 0; step < nStep; step++ ){
 

@@ -13,7 +13,7 @@ if [ -e $PATH ]; then
 	exit 1
 fi
 
-for dim in {6..10}; do
+for dim in {6..12}; do
 	for i in {1..10}; do 
 		timeval=$(./cell_gpu_dim_2 $[2**$dim] 1024 1)
 		echo $timeval >> $PATH
