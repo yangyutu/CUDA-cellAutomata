@@ -6,8 +6,8 @@ if [ ! -e $DIR ]; then
 fi
 
 #----------------- gpu: global ------------------
-nvcc cell_gpu_dim.cu -o cell_gpu_dim
-PATH="$DIR/gpu_dim.log"
+nvcc cell_gpu_dim_2.cu -o cell_gpu_dim_2
+PATH="$DIR/gpu_dim_2.log"
 if [ -e $PATH ]; then
 	echo "File $PATH already exists, please delete or rename it first!" >&2
 	exit 1
@@ -15,7 +15,7 @@ fi
 
 for dim in {6..10}; do
 	for i in {1..10}; do 
-		timeval=$(./cell_gpu_dim $[2**$dim] 1024 1)
+		timeval=$(./cell_gpu_dim_2 $[2**$dim] 1024 1)
 		echo $timeval >> $PATH
 	done
 	printf "\n" >> $PATH
