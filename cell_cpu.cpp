@@ -45,7 +45,7 @@ int update_cell(int *grid, int *grid_copy, int i, int dim, int iter) {
     else {
         grid[i] = 0;
     }
-
+    
     return 0;
 }
 
@@ -54,19 +54,19 @@ int update_cell(int *grid, int *grid_copy, int i, int dim, int iter) {
  * MAIN ENTRY
  *********************************************************/
 int main(int argc, char *argv[]) {
-    if ( argc != 4 ) {
-        printf("usage: ./cell_cpu dimension nSteps frequency\n");
+    if ( argc != 3 ) {
+        printf("usage: ./cell_cpu dimension nSteps\n");
         exit(1);
     }
     int dim = atoi(argv[1]); // dimension
     int nSteps = atoi(argv[2]); // number of steps
-    int frequency = atoi(argv[3]); // frequency of printing outputs
+//    int frequency = atoi(argv[3]); // frequency of printing outputs
     int size = dim * dim; // size of 1-d array
     int *grid = NULL; // grid use to update
     int *grid_copy = NULL; // copy of original grid in each iteration
     int *temp = NULL;
     clock_t start;
-   
+    
     grid = (int *)malloc(size * sizeof(int));
     memset((void *)grid, 0, size);
     grid[1] = 1;
@@ -74,32 +74,25 @@ int main(int argc, char *argv[]) {
     grid[dim * 2] = 1;
     grid[dim * 2 + 1] = 1;
     grid[dim * 2 + 2] = 1;
-
+    
     grid_copy = (int *)malloc(size * sizeof(int));
     memcpy((void *)grid_copy, (const void *)grid, size * sizeof(int));
     
     //---- get initial time ----
     start=clock();
     for (int iter = 0; iter < nSteps; iter++) {
-        // printf("iteration %d ...\n", iter);
         //------- update grid ------
         for (int i = 0; i < size; i++) {
             update_cell(grid, grid_copy, i, dim, iter);
         }
         //---- update grid_copy ----
-        // memcpy((void *)grid_copy, (const void *)grid, size * sizeof(int));
         temp = grid_copy;
         grid_copy = grid;
         grid = temp;
-        //-------- print out -------
-        // if(iter % frequency == frequency - 1) {
-        //     printf("Iteration %d / %d: \n", iter + 1, nSteps);
-        //     display_grid(grid, dim);
-        // }
     }
-
+    
     //-------- print elapsed time ------
     printf("%f\n", ((float)(clock() - start)) / CLOCKS_PER_SEC);
-
+    
     return 0;
 }

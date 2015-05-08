@@ -21,10 +21,10 @@ __global__ void update(int *in, int *out, int dim){
         }
         sum = sum - in[offset];
         if (in[offset] == 1) {
-            if (sum == 2 || sum ==3) { 
+            if (sum == 2 || sum ==3) {
                 out[offset] = 1;
             }
-            else { 
+            else {
                 out[offset] = 0;
             }
         }
@@ -41,14 +41,14 @@ __global__ void update(int *in, int *out, int dim){
 }
 
 int main(int argc, char *argv[]) {
-
+    
     clock_t start;
     clock_t gpu_start;
     float gpu_comp_time = 0;
     float gpu_mem_to_time = 0, gpu_mem_back_time=0;
     int dim = atoi(argv[1]);
     int nStep = atoi(argv[2]);
-    int frequency = atoi(argv[3]);
+//    int frequency = atoi(argv[3]);
     int size = dim * dim;
     int step;
     DataBlock data;
@@ -65,44 +65,30 @@ int main(int argc, char *argv[]) {
     int bitmapSize=size * sizeof(int);
     
     start=clock();
-
+    
     gpu_start = clock();
     HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_in), bitmapSize));
     HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_out), bitmapSize));
     HANDLE_ERROR(cudaMemcpy(data.dev_in, data.bitmap, bitmapSize, cudaMemcpyHostToDevice));
- gpu_mem_to_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
-
+    gpu_mem_to_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
+    
     dim3 dimgrid(dim / 16, dim / 16);
     dim3 dimblock(16, 16);
-         gpu_start = clock();   
+    gpu_start = clock();
+    
     for(step = 0; step < nStep; step++ ){
-
-
         update<<<dimgrid,dimblock>>>(data.dev_in, data.dev_out,dim);
-  
-
         swap(data.dev_in,data.dev_out);
- //       if(step % frequency == frequency - 1 ){
- //           gpu_start = clock();
- //           HANDLE_ERROR(cudaMemcpy(data.outbitmap, data.dev_out, bitmapSize, cudaMemcpyDeviceToHost));
- //           gpu_mem_time += ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
-            // printf ( "\nIteration %d: final grid:\n", step );
-            // for (int j = 0; j < size; j++) {
-            //     if ( j % dim == 0 ) {
-            //         printf( "\n" );
-            //     }
-            //     printf("%d", data.outbitmap[j]);
-            // }
-            // printf( "\n" );
-//        }
     }
-	cudaDeviceSynchronize();
-      gpu_comp_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
-            gpu_start = clock();
-            HANDLE_ERROR(cudaMemcpy(data.outbitmap, data.dev_out, bitmapSize, cudaMemcpyDeviceToHost));
-            gpu_mem_back_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
+    
+    cudaDeviceSynchronize();
+    gpu_comp_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
+    gpu_start = clock();
+    HANDLE_ERROR(cudaMemcpy(data.outbitmap, data.dev_out, bitmapSize, cudaMemcpyDeviceToHost));
+    gpu_mem_back_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
     HANDLE_ERROR(cudaFree(data.dev_out));
     HANDLE_ERROR(cudaFree(data.dev_in));
-printf("%f %f %f ", gpu_comp_time, gpu_mem_to_time, gpu_mem_back_time);
+    
+    printf("%f %f %f ", gpu_comp_time, gpu_mem_to_time, gpu_mem_back_time);
     printf("%f\n", ((float)(clock() - start)) / CLOCKS_PER_SEC);
 }
