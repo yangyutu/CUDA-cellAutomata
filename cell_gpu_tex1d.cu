@@ -70,14 +70,12 @@ int main(int argc, char *argv[]){
     int bitmapSize=size * sizeof(int);
     
     start=clock();
-    
     gpu_start = clock();
     
-    
     int flag;
+
     HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_in), bitmapSize));
     HANDLE_ERROR(cudaMalloc( (void **)&(data.dev_out), bitmapSize));
-    
     
     HANDLE_ERROR(cudaBindTexture (NULL, texIn, data.dev_in, bitmapSize));
     HANDLE_ERROR(cudaBindTexture (NULL, texOut, data.dev_out, bitmapSize));
@@ -91,6 +89,7 @@ int main(int argc, char *argv[]){
     
     gpu_start = clock();
     flag = 1;
+
     for(step = 0; step<nStep; step++ ){
         int *in,*out;
         
@@ -111,6 +110,7 @@ int main(int argc, char *argv[]){
     gpu_mem_back_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
     HANDLE_ERROR(cudaFree(data.dev_in));
     HANDLE_ERROR(cudaFree(data.dev_out));
+    
     printf("%f %f %f ", gpu_comp_time, gpu_mem_to_time, gpu_mem_back_time);
     printf("%f\n", ((float)(clock() - start)) / CLOCKS_PER_SEC);
 }

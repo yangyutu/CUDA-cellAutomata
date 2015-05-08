@@ -71,9 +71,7 @@ int main(int argc, char *argv[]){
     data.outbitmap = (int *)malloc(size * sizeof(int));
     int bitmapSize = size * sizeof(int);
     
-    
     start=clock();
-    
     gpu_start = clock();
     
     int flag;
@@ -81,10 +79,9 @@ int main(int argc, char *argv[]){
     HANDLE_ERROR(cudaMalloc((void **)&(data.dev_out), bitmapSize));
     
     cudaChannelFormatDesc desc = cudaCreateChannelDesc<int>();
+
     HANDLE_ERROR(cudaBindTexture2D(NULL, texIn, data.dev_in, desc, dim, dim, sizeof(int) * dim));
     HANDLE_ERROR(cudaBindTexture2D(NULL, texOut, data.dev_out, desc, dim, dim, sizeof(int) * dim));
-    
-    
     
     HANDLE_ERROR(cudaMemcpy(data.dev_in, data.bitmap, bitmapSize, cudaMemcpyHostToDevice));
     
@@ -97,17 +94,15 @@ int main(int argc, char *argv[]){
     
     for(step = 0; step < nStep; step++ ){
         int *in,*out;
-        
         if( flag == 1 ) {
             out = data.dev_out;flag = 0;
         }
         else {
             out=data.dev_in; flag = 1;
         }
-        
         update_tex1d<<<dimgrid,dimblock>>>(out,flag,dim);
-
     }
+    
     cudaDeviceSynchronize();
     gpu_comp_time += ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
     gpu_start = clock();

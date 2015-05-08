@@ -5,7 +5,6 @@
 
 // the kernel to udpate the state of each cell based on its neighbors for certain number of steps
 __global__ void update(int *in, int *out, int dim){
-    
     int offset = threadIdx.x + blockIdx.x * blockDim.x;
     int x = offset % dim;
     int y = (int)(offset / dim);
@@ -86,12 +85,14 @@ int main(int argc, char *argv[]) {
     }
     
     gpu_start = clock();
+
     for(step = 0; step < nStep; step++ ){
         
         update<<<grid_dim, block_dim>>>(data.dev_in, data.dev_out,dim);
         
         swap(data.dev_in,data.dev_out);
     }
+
     cudaDeviceSynchronize();
     gpu_comp_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
     gpu_start = clock();
@@ -99,6 +100,7 @@ int main(int argc, char *argv[]) {
     gpu_mem_back_time = ((float)(clock() - gpu_start)) / CLOCKS_PER_SEC;
     HANDLE_ERROR(cudaFree(data.dev_out));
     HANDLE_ERROR(cudaFree(data.dev_in));
+    
     printf("%f %f %f ", gpu_comp_time, gpu_mem_to_time, gpu_mem_back_time);
     printf("%f\n", ((float)(clock() - start)) / CLOCKS_PER_SEC);
 }
